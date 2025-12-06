@@ -21,7 +21,6 @@ function normalizeBaseUrl(baseUrl: string): string {
 export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 	name = 'wechatOfficialAccountCredentialsApi';
 	displayName = 'Wechat Official Account Credentials API';
-	
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Base URL',
