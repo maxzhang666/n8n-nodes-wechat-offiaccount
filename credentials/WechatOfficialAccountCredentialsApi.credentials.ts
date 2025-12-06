@@ -7,10 +7,21 @@ import {
 	INodeProperties,
 } from 'n8n-workflow';
 
+// Helper function to normalize base URL with protocol
+function normalizeBaseUrl(baseUrl: string): string {
+	const url = baseUrl.trim();
+	// If URL already contains http or https protocol, return as-is
+	if (url.startsWith('http://') || url.startsWith('https://')) {
+		return url;
+	}
+	// Otherwise, add https:// prefix
+	return `https://${url}`;
+}
 
 export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 	name = 'wechatOfficialAccountCredentialsApi';
 	displayName = 'Wechat Official Account Credentials API';
+	
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Base URL',
@@ -54,7 +65,7 @@ export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 		// 	// 验证是否正常，正常直接使用即可
 		// 	const res = (await this.helpers.httpRequest({
 		// 		method: 'GET',
-		// 		url: `https://${credentials.baseUrl}/cgi-bin/get_api_domain_ip?access_token=${credentials.accessToken}`,
+		// 		url: `${normalizeBaseUrl(credentials.baseUrl as string)}/cgi-bin/get_api_domain_ip?access_token=${credentials.accessToken}`,
 		// 	})) as any;
 		//
 		// 	console.log('exist accessToken', res);
@@ -67,7 +78,7 @@ export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 
 		const res = (await this.helpers.httpRequest({
 			method: 'GET',
-			url: `https://${credentials.baseUrl}/cgi-bin/token?grant_type=client_credential&appid=${credentials.appid}&secret=${credentials.appsecret}`,
+			url: `${normalizeBaseUrl(credentials.baseUrl as string)}/cgi-bin/token?grant_type=client_credential&appid=${credentials.appid}&secret=${credentials.appsecret}`,
 		})) as any;
 
 		console.log('preAuthentication', res);
@@ -111,7 +122,7 @@ export class WechatOfficialAccountCredentialsApi implements ICredentialType {
 	// The block below tells how this credential can be tested
 	test: ICredentialTestRequest = {
 		request: {
-			baseURL: '=https://{{$credentials.baseUrl}}',
+			baseURL: '={{ $credentials.baseUrl.startsWith("http://") || $credentials.baseUrl.startsWith("https://") ? $credentials.baseUrl : "https://" + $credentials.baseUrl }}',
 			url: '/cgi-bin/get_api_domain_ip',
 		},
 		rules: [
